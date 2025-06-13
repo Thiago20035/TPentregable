@@ -1,31 +1,48 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Listado de Teléfonos</title>
+  <title>Phone List</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <button onclick="getObject()">Cargar Teléfonos</button>
-  <button onclick="addObject()">Agregar Teléfono</button>
-  <h1>Listado de Teléfonos desde la API</h1>
-
+  <!-- Button to open modal -->
+  
+  <h1>Phone List from API</h1>
+  
+  <!-- Table to display phones -->
   <table>
     <thead>
       <tr>
         <th>ID</th>
-        <th>NOMBRE</th>
+        <th>Name</th>
         <th>Color</th>
-        <th>Capacidad</th>
-        <th>Acciones</th>
+        <th>Capacity</th>
+        <th>Actions</th>
       </tr>
     </thead>
-    <tbody id="tabla-telefonos"></tbody>
+    <tbody id="phone-table"></tbody>
   </table>
-
-  <script src="Script.js"></script>
+  
+  <!-- Dark overlay behind the modal -->
+  <div id="modalOverlay"></div>
+  
+  <!-- Modal for adding/editing phones -->
+  <div id="phoneModal">
+    <h3 id="modalTitle">Add Phone</h3>
+    <input id="nameInput" placeholder="Name">
+    <input id="colorInput" placeholder="Color">
+    <input id="capacityInput" placeholder="Capacity">
+    <div style="text-align: right; margin-top: 20px;">
+      <button class="btn-confirm" onclick="confirmModal()">Save</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+  
+  <!-- JavaScript logic -->
+  <script src="script.js"></script>
 </body>
-
+<footer>
+  <button class="btn-add" onclick="showModal('create')">Add Phone</button>
+</footer>
 </html>
