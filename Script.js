@@ -27,6 +27,7 @@ function getPhones() {
     });
 }
 
+// Función para cargar teléfonos (GET)
 function loadPhones() {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
@@ -34,6 +35,55 @@ function loadPhones() {
     request.responseType = "json";
     request.onload = function () {
       request.status === 200
+        ? resolve(request.response)
+        : reject(Error(request.statusText));
+    };
+    request.onerror = () => reject(Error("Network error"));
+    request.send();
+  });
+}
+
+// Función para crear un teléfono (POST)
+function createPhone(phoneData) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("POST", url);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.responseType = "json";
+    request.onload = function () {
+      request.status === 200 || request.status === 201
+        ? resolve(request.response)
+        : reject(Error(request.statusText));
+    };
+    request.onerror = () => reject(Error("Network error"));
+    request.send(JSON.stringify(phoneData));
+  });
+}
+
+// Función para actualizar un teléfono (PUT)
+function updatePhone(id, phoneData) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("PUT", `${url}/${id}`);
+    request.setRequestHeader("Content-Type", "application/json");
+    request.responseType = "json";
+    request.onload = function () {
+      request.status === 200
+        ? resolve(request.response)
+        : reject(Error(request.statusText));
+    };
+    request.onerror = () => reject(Error("Network error"));
+    request.send(JSON.stringify(phoneData));
+  });
+}
+
+// Función para eliminar un teléfono (DELETE)
+function deletePhoneAPI(id) {
+  return new Promise((resolve, reject) => {
+    const request = new XMLHttpRequest();
+    request.open("DELETE", `${url}/${id}`);
+    request.onload = function () {
+      request.status === 200 || request.status === 405
         ? resolve(request.response)
         : reject(Error(request.statusText));
     };
@@ -107,29 +157,20 @@ function confirmModal() {
   };
 
   if (currentMode === "create") {
-    fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newPhone)
-    })
-      .then(res => res.json())
+    createPhone(newPhone)
       .then(data => {
         localPhones.push(data);
         alert("Phone added.");
         getPhones();
         closeModal();
       })
-      .catch(err => {
-        console.error("Error adding phone:", err);
+      .catch(error => {
+        console.error("Error adding phone:", error);
+        alert("Error adding phone");
       });
 
   } else if (currentMode === "edit") {
-    fetch(`${url}/${editingPhone.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newPhone)
-    })
-      .then(res => res.json())
+    updatePhone(editingPhone.id, newPhone)
       .then(updated => {
         const index = localPhones.findIndex(p => p.id === editingPhone.id);
         if (index >= 0) {
@@ -143,6 +184,7 @@ function confirmModal() {
       })
       .catch(error => {
         console.error("Error updating phone:", error);
+        alert("Error updating phone");
       });
   }
 }
@@ -150,17 +192,14 @@ function confirmModal() {
 function deletePhone(id, row) {
   if (!confirm("Are you sure you want to delete this phone?")) return;
 
-  fetch(`${url}/${id}`, { method: "DELETE" })
-    .then(response => {
-      if (response.ok || response.status === 405) {
-        localPhones = localPhones.filter(p => p.id !== id);
-        row.remove();
-        alert("Phone deleted.");
-      } else {
-        alert("Could not delete the phone.");
-      }
+  deletePhoneAPI(id)
+    .then(() => {
+      localPhones = localPhones.filter(p => p.id !== id);
+      row.remove();
+      alert("Phone deleted.");
     })
     .catch(error => {
       console.error("Error deleting phone:", error);
+      alert("Error deleting phone");
     });
 }
